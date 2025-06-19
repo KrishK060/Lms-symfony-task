@@ -8,9 +8,11 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\Timestampable;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=CountryRepository::class)
+ * @UniqueEntity(fields={"name"}, message="This country already exists.")
  */
 class Country
 {
@@ -23,7 +25,7 @@ class Country
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, unique=true)
      */
     private $name;
 
