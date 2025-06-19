@@ -3,6 +3,7 @@
 {% block title %}Country index{% endblock %}
 
 {% block body %}
+<div class="container">
     <h1>Country index</h1>
 
     <form method="get" action="{{ path('app_country_index') }}" class="mb-3">
@@ -42,4 +43,5 @@
     </table>
 
     <a href="{{ path('app_country_new') }}">Create new</a>
+</div>
 {% endblock %}

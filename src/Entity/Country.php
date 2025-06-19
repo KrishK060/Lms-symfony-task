@@ -28,7 +28,7 @@ class Country
     private $name;
 
     /**
-     * @ORM\OneToMany(targetEntity=City::class, mappedBy="countryId")
+     * @ORM\OneToMany(targetEntity=City::class, mappedBy="country")
      */
     private $cities;
 

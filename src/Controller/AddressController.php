@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Address;
+use App\Entity\City;
 use App\Form\AddressType;
 use App\Repository\AddressRepository;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -61,27 +63,54 @@ class AddressController extends AbstractController
      */
     public function edit(Request $request, Address $address, AddressRepository $addressRepository): Response
     {
-        $form = $this->createForm(AddressType::class, $address);
-        $form->handleRequest($request);
+        $country = $address->getCountry(); 
+        $cities = [];
+    
+        if ($country) {
+            $cities = $country->getCities()->toArray();
+        }
+        // dd($cities);
 
+        $form = $this->createForm(AddressType::class, $address, [
+            'cities' => $cities,
+        ]);
+        $form->handleRequest($request);
+    
+        if ($form->isSubmitted()) {
+            $country = $form->get('country')->getData();
+            if ($country) {
+                $cities = $country->getCities();
+                $form->add('city', EntityType::class, [
+                    'class' => City::class,
+                    'choices' => $cities,
+                    'choice_label' => 'name',
+                    'placeholder' => 'Choose a city',
+                    'mapped' => true,
+                    'required' => true,
+                ]);
+            }
+        }
+    
         if ($form->isSubmitted() && $form->isValid()) {
             $addressRepository->add($address, true);
-
+    
             return $this->redirectToRoute('app_address_index', [], Response::HTTP_SEE_OTHER);
         }
-
+    
         return $this->renderForm('address/edit.html.twig', [
             'address' => $address,
             'form' => $form,
         ]);
     }
+    
+
 
     /**
      * @Route("/{id}", name="app_address_delete", methods={"POST"})
      */
     public function delete(Request $request, Address $address, AddressRepository $addressRepository): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$address->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $address->getId(), $request->request->get('_token'))) {
             $addressRepository->remove($address, true);
         }
 
